@@ -4,6 +4,37 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 
 <mapper namespace="Security">
-
+ 
+	<resultMap id = "memberMap" type="member"> 
+	<!-- type속성은 반환 자료형으로 MemberVO 타입 별칭 member를 지정 -->	
+		<id property="userid" column="userid" /> <!-- id는 구분 식별키 => 기본키 -->
+		<result property="userid" column="userid" /> 
+		<!-- 프로퍼티 속성값은 MemberVO 빈클래스의 변수명인 속성명이고 column속성값인 userid는 해당 테이블의 컬럼이다.
+			일대일 매핑시킴, 주로 빈클래스 변수명과 테이블 컬럼명이 다른경우 사용함. -->
+		<result property="userpw" column="userpw" />
+		<result property="userName" column="username" /> 
+		<!-- userName 변수명과 해당 컬럼명인 username과 이름이 다르다. 
+		결국 username 컬럼으로부터 레코드를 가져와서 userName 변수의 setter()메서드를 호출해 값 저장시킴 -->
+		<result property="regDate" column="regdate" />
+		<result property="updateDate" column="updatedate" />
+		<collection property="authList" resultMap="authMap" /> 
+		<!-- 컬렉션 제네릭 AuthVO타입으로 복수개 값을 저장하기 위해 result Map 아이디 authMap을 호출-->
+	</resultMap>
+	
+	<resultMap type="authvo" id="authMap">
+	 <result property="userid" column="userid" />
+	 <result property="auth" column="auth" />
+	</resultMap>
+	
+	<select id ="readMem" parameterType="java.lang.String" resultMap= "memberMap">
+	 <!-- resultmap id memberMap을 호출 -->
+	 select mem.userid, userpw, username, enabled, regdate, updatedate, auth
+	 from tbl_member mem left outer join tbl_member_auth auth
+	 on mem.userid = auth.userid where mem.userid=#{userid}
+	 
+	</select>
+	<!-- left outer join기법은 from절 다음에 테이블명을 기술할 때 왼쪽, 오른쪽에 양 옆으로 명시하는데,
+		오른쪽 테이블에 데이터가 없는 경우 사용하는 조인 기법이다.-->
+		
 </mapper>
 	
